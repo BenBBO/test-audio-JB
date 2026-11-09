@@ -1,0 +1,21 @@
+# /etc/systemd/system/wyoming-openwakeword.service  (container LXC, mode A uniquement)
+
+[Unit]
+Description=Wyoming openWakeWord
+
+[Service]
+Type=simple
+User=voice
+Group=voice
+WorkingDirectory=/opt/wyoming-openwakeword
+# Modèles personnalisés (.tflite) dans custom/ : nom du fichier sans extension = nom du wake word
+ExecStart=/opt/wyoming-openwakeword/script/run \
+  --uri 'tcp://127.0.0.1:10400' \
+  --custom-model-dir /opt/wyoming-openwakeword/custom \
+  --threshold 0.5 \
+  --trigger-level 1
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

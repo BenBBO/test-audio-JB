@@ -1,0 +1,51 @@
+# /etc/systemd/system/wyoming-satellite.service  (Raspberry Pi)
+# Adapter : utilisateur (pi), chemin, --name, et le périphérique ALSA (arecord -L).
+
+[Unit]
+Description=Wyoming Satellite
+Wants=network-online.target
+After=network-online.target sound.target
+# Mode B (wake word local) : décommenter
+#Requires=wyoming-openwakeword.service
+#After=wyoming-openwakeword.service
+# LED du HAT : décommenter et ajouter --event-uri 'tcp://127.0.0.1:10500' à ExecStart
+#Requires=2mic-leds.service
+
+[Service]
+Type=simple
+User=pi
+SupplementaryGroups=audio
+WorkingDirectory=/home/pi/wyoming-satellite
+
+# Mode A (demandé) : streaming continu, wake word détecté sur le container
+ExecStart=/home/pi/wyoming-satellite/script/run \
+  --name 'salon' \
+  --uri 'tcp://0.0.0.0:10700' \
+  --no-zeroconf \
+  --mic-command 'arecord -D plughw:CARD=seeed2micvoicec,DEV=0 -r 16000 -c 1 -f S16_LE -t raw' \
+  --snd-command 'aplay -D plughw:CARD=seeed2micvoicec,DEV=0 -r 22050 -c 1 -f S16_LE -t raw' \
+  --mic-auto-gain 5 \
+  --mic-noise-suppression 2 \
+  --awake-wav sounds/awake.wav \
+  --done-wav sounds/done.wav
+
+# Mode B (recommandé) : wake word détecté sur le Pi, audio envoyé seulement après.
+# Commenter le bloc ExecStart ci-dessus et décommenter celui-ci.
+#ExecStart=/home/pi/wyoming-satellite/script/run \
+#  --name 'salon' \
+#  --uri 'tcp://0.0.0.0:10700' \
+#  --no-zeroconf \
+#  --mic-command 'arecord -D plughw:CARD=seeed2micvoicec,DEV=0 -r 16000 -c 1 -f S16_LE -t raw' \
+#  --snd-command 'aplay -D plughw:CARD=seeed2micvoicec,DEV=0 -r 22050 -c 1 -f S16_LE -t raw' \
+#  --mic-auto-gain 5 \
+#  --mic-noise-suppression 2 \
+#  --wake-uri 'tcp://127.0.0.1:10400' \
+#  --wake-word-name 'okay_nabu' \
+#  --awake-wav sounds/awake.wav \
+#  --done-wav sounds/done.wav
+
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

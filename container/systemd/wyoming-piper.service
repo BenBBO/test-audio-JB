@@ -1,0 +1,21 @@
+# /etc/systemd/system/wyoming-piper.service  (container LXC, optionnel : réponse vocale)
+
+[Unit]
+Description=Wyoming Piper (TTS local)
+
+[Service]
+Type=simple
+User=voice
+Group=voice
+WorkingDirectory=/opt/wyoming-piper
+# La voix est téléchargée au premier lancement dans --download-dir, puis tout reste local.
+ExecStart=/opt/wyoming-piper/script/run \
+  --uri 'tcp://127.0.0.1:10200' \
+  --voice fr_FR-siwis-medium \
+  --data-dir /var/lib/wyoming/piper \
+  --download-dir /var/lib/wyoming/piper
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,28 @@
+# /etc/systemd/system/wyoming-faster-whisper.service  (container LXC)
+# Modèle à adapter si le serveur Whisper existant est installé ailleurs :
+# remplacer ExecStart par sa commande actuelle, en gardant --uri sur 127.0.0.1.
+
+[Unit]
+Description=Wyoming Faster Whisper (STT local)
+
+[Service]
+Type=simple
+User=voice
+Group=voice
+WorkingDirectory=/opt/wyoming-faster-whisper
+# small : bon compromis en français sur CPU ; medium si le CPU suit (latence x2-3).
+# --initial-prompt : vocabulaire de la maison (pièces, équipements) pour guider Whisper.
+ExecStart=/opt/wyoming-faster-whisper/script/run \
+  --uri 'tcp://127.0.0.1:10300' \
+  --model small \
+  --compute-type int8 \
+  --language fr \
+  --vad-filter \
+  --initial-prompt 'Allume, éteins, ouvre, ferme la lumière, les volets, le chauffage du salon, de la cuisine, de la chambre.' \
+  --data-dir /var/lib/wyoming/whisper \
+  --download-dir /var/lib/wyoming/whisper
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

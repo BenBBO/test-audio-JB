@@ -1,0 +1,19 @@
+# /etc/systemd/system/2mic-leds.service  (Raspberry Pi, optionnel)
+# LED APA102 du ReSpeaker 2-Mic : nécessite SPI activé (dtparam=spi=on).
+
+[Unit]
+Description=LED du ReSpeaker 2-Mic (événements Wyoming)
+
+[Service]
+Type=simple
+User=pi
+SupplementaryGroups=spi gpio
+WorkingDirectory=/home/pi/wyoming-satellite/examples
+ExecStart=/home/pi/wyoming-satellite/examples/.venv/bin/python3 2mic_service.py \
+  --uri 'tcp://127.0.0.1:10500' \
+  --led-brightness 5
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

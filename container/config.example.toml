@@ -1,0 +1,56 @@
+# /etc/voice-bridge/config.toml  (chmod 600 : contient la clé API Jeedom)
+
+[stt]
+# wyoming-faster-whisper, idéalement lié à 127.0.0.1 sur le container
+uri = "tcp://127.0.0.1:10300"
+language = "fr"
+# Remet la commande en minuscules et retire la ponctuation finale avant Jeedom
+lowercase = true
+# Phrases que Whisper « entend » dans le silence : jamais envoyées à Jeedom
+# (comparaison sans accents ni ponctuation, par inclusion)
+ignored_phrases = [
+  "sous-titres réalisés par la communauté d'Amara.org",
+  "sous-titrage ST' 501",
+  "sous-titrage Société Radio-Canada",
+  "merci d'avoir regardé",
+  "abonnez-vous",
+]
+
+[wake]
+# Utilisé seulement par les satellites lancés SANS --wake-uri (streaming continu).
+# Retirer la section si tous les satellites détectent le wake word eux-mêmes.
+uri = "tcp://127.0.0.1:10400"
+names = ["okay_nabu"]   # ou le nom d'un modèle personnalisé (fichier .tflite sans extension)
+
+[tts]
+# Optionnel : supprimer la section pour ne pas lire la réponse de Jeedom
+uri = "tcp://127.0.0.1:10200"
+voice = "fr_FR-siwis-medium"
+
+[jeedom]
+url = "http://192.168.1.10/core/api/jeeApi.php"
+apikey = "COLLER_ICI_LA_CLE_API_JEEDOM"
+verify_tls = true        # false pour un Jeedom en https avec certificat auto-signé
+timeout = 10
+# reply_cmd = 1234       # id d'une commande Jeedom qui reçoit aussi la réponse (notification, TTS Jeedom…)
+
+[vad]
+aggressiveness = 2       # 0 = tolérant … 3 = strict (pièce bruyante)
+speech_seconds = 0.3     # parole cumulée avant de considérer que la commande a commencé
+silence_seconds = 0.8    # silence qui clôt la commande
+no_speech_timeout = 6.0  # abandon si rien n'est dit après le wake word
+max_command_seconds = 15.0
+
+[bridge]
+ping_interval = 5        # keep-alive vers les satellites
+reconnect_seconds = 5
+audio_timeout = 5        # abandon si le satellite n'envoie plus d'audio en pleine commande
+
+[[satellites]]
+name = "salon"
+uri = "tcp://192.168.1.50:10700"
+# profile = "benjamin"   # profil transmis au moteur d'interaction Jeedom
+
+# [[satellites]]
+# name = "cuisine"
+# uri = "tcp://192.168.1.51:10700"

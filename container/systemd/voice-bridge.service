@@ -1,0 +1,21 @@
+# /etc/systemd/system/voice-bridge.service  (container LXC)
+
+[Unit]
+Description=Pont Wyoming -> Jeedom (satellites vocaux)
+Wants=network-online.target
+After=network-online.target wyoming-faster-whisper.service wyoming-openwakeword.service wyoming-piper.service
+
+[Service]
+Type=simple
+User=voice
+Group=voice
+ExecStart=/opt/voice-bridge/.venv/bin/python /opt/voice-bridge/voice_bridge.py --config /etc/voice-bridge/config.toml
+Restart=always
+RestartSec=5
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
