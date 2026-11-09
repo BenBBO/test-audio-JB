@@ -1,0 +1,9 @@
+# Fins de ligne LF partout : les fichiers sont copiés tels quels sur le Pi et le container
+# (un CR en fin de ligne casse ExecStart dans les services systemd).
+* text=auto eol=lf
+
+*.pdf binary
+*.tar.gz binary
+*.gz binary
+*.wav binary
+*.png binary
